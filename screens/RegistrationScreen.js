@@ -3,6 +3,10 @@ import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Touchab
 import { Image, Input, Button } from 'react-native-elements';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+
+import { auth } from '../firebase';
+
 
 const RegistrationScreen = () => {
   const navigation = useNavigation();
@@ -10,7 +14,16 @@ const RegistrationScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [repeatPassword, setRepeatPassword] = useState('');
-  const signIn = () => {};
+  const register =  () => {
+    createUserWithEmailAndPassword(auth, email, password)
+    .then((authUser) => {
+      updateProfile(auth.currentUser, {displayName: fullName});
+    })
+    .catch((error) => {
+      const errorMessage = error.message;
+      alert(errorMessage)
+    });
+  }
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
@@ -27,7 +40,7 @@ const RegistrationScreen = () => {
           <Input placeholder='Password' secureTextEntry value={password} onChangeText={(text) => setPassword(text)} />
           <Input placeholder='Repeat password' secureTextEntry value={repeatPassword} onChangeText={(text) => setRepeatPassword(text)} />
         </View>
-        <Button style={styles.button} onPress={signIn} title='Register' />
+        <Button style={styles.button} onPress={register} title='Register' />
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <Text style={styles.text}>Already have an account?</Text>
         </TouchableOpacity>

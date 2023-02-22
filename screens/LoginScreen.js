@@ -1,18 +1,41 @@
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {Image, Input, Button} from "react-native-elements"
 import { StatusBar } from 'expo-status-bar'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { useNavigation } from '@react-navigation/native';
+import { auth } from '../firebase';
 
 const LoginScreen = () => {
     const navigation = useNavigation()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const SignIn = () => {
-
+        auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Home' }],
+            });
+        })
+        .catch((error) => {
+            const errorMessage = error.message;
+            alert(errorMessage)
+        });
     }
+
+    useEffect(()=>{
+        const unsubscribe =  auth.onAuthStateChanged((authUser)=>{
+            if(authUser){
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Home' }],
+                  });
+            }
+        })
+        return unsubscribe
+    },[])
 
     const dismissKeyboard = () => {
         Keyboard.dismiss()
@@ -24,8 +47,8 @@ const LoginScreen = () => {
         <StatusBar style="light" />
         <Image source={require("../images/background.png")}/>
         <View style={styles.inputContainer} >
-            <Input autoFocus placeholder='Email' type="email" value={email} onChangeText={(e)=>setEmail(e.target.value)}/>
-            <Input  placeholder='Password' secureTextEntry type="password" value={password} onChangeText={(e)=>setPassword(e.target.value)}/>
+            <Input autoFocus placeholder='Email' type="email" value={email} onChangeText={(text)=>setEmail(text)}/>
+            <Input  placeholder='Password' secureTextEntry type="password" value={password} onChangeText={(text)=>setPassword(text)}/>
         </View>
           <Button style={styles.button}  onPress={SignIn} title="Login"/>
           <TouchableOpacity onPress={()=>navigation.navigate("Registration")}>
