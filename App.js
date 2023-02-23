@@ -23,6 +23,7 @@ export default function App() {
   
   return (
     <NavigationContainer>
+      <StatusBar style="dark"/>
       <Stack.Navigator initialRouteName='Login' screenOptions={globalScreenOptions}>
         <Stack.Screen name="Home" component={HomeScreen}
         // options={{headerShown: false}}
